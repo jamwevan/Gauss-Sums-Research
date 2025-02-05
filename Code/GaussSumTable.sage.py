@@ -55,7 +55,7 @@ def complex_gauss_sum_table(q):
         
     return GaussSumTable(q, e**(_sage_const_2  * pi * I / p), e**(_sage_const_2  * pi * I / (q*q - _sage_const_1 )))
 
-def save_gauss_sum_table_as_latex_pdf(table, filename="GaussSumTable_LaTeX.pdf"):
+def save_gauss_sum_table_as_latex_pdf(table, filename="GaussSumTable_output.pdf"):
     """
     Saves the Gauss sum table in a structured LaTeX format inside a PDF.
     Each entry appears on a separate row and is sorted.
