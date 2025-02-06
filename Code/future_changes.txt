@@ -1,0 +1,3 @@
+Specify Theta Values (Indices).
+Make program dynamic.
+Validate output with base code.
