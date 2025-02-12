@@ -3,14 +3,21 @@
 <style>table { border-collapse: collapse; width: 100%; }th, td { border: 1px solid black; padding: 5px; text-align: center; font-size: 18px; }th { background-color: #f2f2f2; }.color-d1ffd1 { background-color: #d1ffd1; }
 .color-d1e7ff { background-color: #d1e7ff; }
 .color-ffd1d1 { background-color: #ffd1d1; }
+.color-fff7d1 { background-color: #fff7d1; }
+.color-d1fff5 { background-color: #d1fff5; }
 </style>
 </head><body>
 <h2>Gauss Sum Table</h2>
 <div style="overflow-x:auto;"><table>
-<tr><th>\( \theta \backslash \alpha \)</th><th>\( \alpha = 0 \)</th></tr>
-<tr class='color-ffd1d1'><td>\( 0 \)</td><td>\( -1 \)</td></tr>
-<tr class='color-d1ffd1'><td>\( 1 \)</td><td>\( -{\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} - \frac{1}{2} i \, \sqrt{3} + \frac{3}{2} \)</td></tr>
-<tr class='color-d1e7ff'><td>\( 2 \)</td><td>\( -{\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{4} - {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + 1 \)</td></tr>
+<tr><th>\( \theta \backslash \alpha \)</th><th>\( \alpha = 0 \)</th><th>\( \alpha = 1 \)</th></tr>
+<tr class='color-d1ffd1'><td>\( 0 \)</td><td>\( 3 \, {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{3}{2} i \, \sqrt{3} + \frac{1}{2} \)</td><td>\( -{\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} - \frac{1}{2} i \, \sqrt{3} + \frac{5}{2} \)</td></tr>
+<tr class='color-ffd1d1'><td>\( 1 \)</td><td>\( -i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} - \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td><td>\( i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td></tr>
+<tr class='color-fff7d1'><td>\( 2 \)</td><td>\( {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{3} - \frac{5}{2} \)</td><td>\( {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{3} - \frac{5}{2} \)</td></tr>
+<tr class='color-ffd1d1'><td>\( 3 \)</td><td>\( -i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} - \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td><td>\( i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td></tr>
+<tr class='color-d1e7ff'><td>\( 4 \)</td><td>\( -{\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} - \frac{1}{2} i \, \sqrt{3} + \frac{5}{2} \)</td><td>\( 3 \, {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{3}{2} i \, \sqrt{3} + \frac{1}{2} \)</td></tr>
+<tr class='color-d1fff5'><td>\( 5 \)</td><td>\( i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td><td>\( -i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} - \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td></tr>
+<tr class='color-fff7d1'><td>\( 6 \)</td><td>\( {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{3} - \frac{5}{2} \)</td><td>\( {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{3} - \frac{5}{2} \)</td></tr>
+<tr class='color-d1fff5'><td>\( 7 \)</td><td>\( i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td><td>\( -i \, \sqrt{2} {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} + {\left(\frac{1}{2} i \, \sqrt{3} - \frac{1}{2}\right)}^{2} - \frac{1}{2} i \, \sqrt{2} {\left(-i \, \sqrt{3} + 1\right)} - \frac{1}{2} i \, \sqrt{3} + \frac{1}{2} \)</td></tr>
 </table>
 </div>
 </body></html>

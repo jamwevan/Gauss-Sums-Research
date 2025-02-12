@@ -1,1 +1,24 @@
 Extend code to work with other fields.
+Remove rest of data. 
+Have data grouped by similarity. 
+Max size.
+Example:
+Max size: 2
+{0}
+{1,3}
+{2,6}
+{3,7}
+{4}
+
+Also when growing only group x and y if x = y mod q-1
+
+Q-1 =2
+{0}
+{1,3}
+{2,6}
+{3,7}
+{4}
+All are grouped well. 
+
+Another column. Theta mod q-1.
+
