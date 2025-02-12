@@ -1,4 +1,1 @@
-Specify Theta Values (Indices).
-Make program dynamic.
-Validate output with base code.
-Highlight all matching entries?
+Extend code to work with other fields.

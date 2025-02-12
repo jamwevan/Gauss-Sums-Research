@@ -1,4 +1,4 @@
-from sage.all import GF, e, pi, I, latex
+from sage.all import GF, e, pi, I, latex, is_prime  # Import required functions
 
 class GaussSumTable:
     def __init__(self, q, additive_character_generator, multiplicative_character_generator):
@@ -6,25 +6,25 @@ class GaussSumTable:
         self.additive_character_generator = additive_character_generator
         self.multiplicative_character_generator = multiplicative_character_generator
 
-        self.finite_field = GF(q^2)
+        self.finite_field = GF(q**2)  # Corrected exponentiation syntax
         self.generator = self.finite_field.gen()
         self.finite_field_elements = list(self.finite_field)
         self.finite_field_multiplicative_group = [x for x in self.finite_field_elements if x != 0]
 
-        self.table = [[0 for _ in range(q - 1)] for _ in range(q^2 - 1)]
+        self.table = [[0 for _ in range(q - 1)] for _ in range(q**2 - 1)]
         self.compute_gauss_sum_table()
 
     def compute_gauss_sum_table(self):
-        for theta in range(self.q^2 - 1):
+        for theta in range(self.q**2 - 1):
             for alpha in range(self.q - 1):
                 self.table[theta][alpha] = self.compute_gauss_sum(theta, alpha)
 
     def compute_gauss_sum(self, theta, alpha):
         total = 0
         for x in self.finite_field_multiplicative_group:
-            additive_character_value = self.additive_character_generator^self.trace(x)
-            theta_character_value = self.multiplicative_character_generator^(theta * self.log(x))
-            alpha_character_value = self.multiplicative_character_generator^(alpha * self.get_norm_log(x))
+            additive_character_value = self.additive_character_generator ** self.trace(x)
+            theta_character_value = self.multiplicative_character_generator ** (theta * self.log(x))
+            alpha_character_value = self.multiplicative_character_generator ** (alpha * self.get_norm_log(x))
             total += additive_character_value * theta_character_value * alpha_character_value
         return total
 
@@ -38,17 +38,23 @@ class GaussSumTable:
         return x.trace()
 
 def complex_gauss_sum_table(q):
-    prime_power_result = q.is_prime_power(get_data=True)
-    if prime_power_result[1] == 0:
-        raise ValueError("Expected a prime power!")
-    p = prime_power_result[0]
-
-    return GaussSumTable(q, e^(2 * pi * I / p), e^(2 * pi * I / (q*q - 1)))
+    if not is_prime(q):  # Ensure q is a prime number
+        raise ValueError("Expected a prime number!")
+    return GaussSumTable(q, e ** (2 * pi * I / q), e ** (2 * pi * I / (q**2 - 1)))
 
 def save_gauss_sum_table_as_html(table, filename="GaussSumTable.html"):
     """
-    Saves the Gauss sum table in an HTML file with MathJax LaTeX rendering.
+    Saves the Gauss sum table in an HTML file with MathJax LaTeX rendering and uniquely highlights groups of matching rows.
     """
+    # Generate a list of distinct colors for groups of matching rows
+    colors = [
+        "#d1ffd1", "#d1e7ff", "#ffd1d1", "#fff7d1", "#d1fff5", "#ffd1f9", "#e1d1ff", "#ffd9d1"
+    ]  # Extend this list if needed
+
+    # Identify unique row groups and assign a color to each
+    unique_rows = list({tuple(row) for row in table})  # Get unique rows
+    color_map = {unique_row: colors[i % len(colors)] for i, unique_row in enumerate(unique_rows)}
+
     with open(filename, "w") as f:
         f.write("<html><head><title>Gauss Sum Table</title>\n")
         f.write('<script type="text/javascript" async '
@@ -56,8 +62,11 @@ def save_gauss_sum_table_as_html(table, filename="GaussSumTable.html"):
                 'config=TeX-AMS-MML_HTMLorMML"></script>\n')
         f.write('<style>table { border-collapse: collapse; width: 100%; }')
         f.write('th, td { border: 1px solid black; padding: 5px; text-align: center; font-size: 18px; }')
-        f.write('th { background-color: #f2f2f2; }</style>\n')
-        f.write("</head><body>\n")
+        f.write('th { background-color: #f2f2f2; }')
+        # Generate CSS classes for each color
+        for unique_row, color in color_map.items():
+            f.write(f'.color-{color.replace("#", "")} {{ background-color: {color}; }}\n')
+        f.write("</style>\n</head><body>\n")
 
         f.write("<h2>Gauss Sum Table</h2>\n")
         f.write('<div style="overflow-x:auto;">')  # Scrollable if needed
@@ -71,7 +80,11 @@ def save_gauss_sum_table_as_html(table, filename="GaussSumTable.html"):
 
         # Data rows with LaTeX rendering
         for theta, row in enumerate(table):
-            f.write(f"<tr><td>\\( {theta} \\)</td>")
+            # Get the color associated with the unique row
+            row_color = color_map[tuple(row)]
+            row_class = f"color-{row_color.replace('#', '')}"  # CSS class for the row
+
+            f.write(f"<tr class='{row_class}'><td>\\( {theta} \\)</td>")
             for value in row:
                 f.write(f"<td>\\( {latex(value)} \\)</td>")
             f.write("</tr>\n")
@@ -80,9 +93,25 @@ def save_gauss_sum_table_as_html(table, filename="GaussSumTable.html"):
 
     print(f"Saved Gauss Sum Table as {filename}")
 
-# Generate the Gauss Sum Table
-gauss_sum_table_object = complex_gauss_sum_table(3)
-table_of_gauss_sum = gauss_sum_table_object.table
+def main():
+    # Ask the user for a prime number
+    while True:
+        try:
+            user_input = int(input("Enter a prime number (q >= 2): "))
+            if user_input < 2 or not is_prime(user_input):  # Check if the number is prime
+                raise ValueError("The number entered is not a prime number or is less than 2.")
+            break
+        except ValueError as e:
+            print(e)
+            print("Please enter a valid prime number (q >= 2).")
 
-# Save as an HTML file
-save_gauss_sum_table_as_html(table_of_gauss_sum)
+    # Generate the Gauss Sum Table using user input
+    gauss_sum_table_object = complex_gauss_sum_table(user_input)
+    table_of_gauss_sum = gauss_sum_table_object.table
+
+    # Save as an HTML file
+    save_gauss_sum_table_as_html(table_of_gauss_sum)
+
+# Run the program
+if __name__ == "__main__":
+    main()
