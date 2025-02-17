@@ -42,34 +42,53 @@ def complex_gauss_sum_table(q):
         raise ValueError("Expected a prime number!")
     return GaussSumTable(q, e ** (2 * pi * I / q), e ** (2 * pi * I / (q**2 - 1)))
 
-def save_gauss_sum_table_as_html(table, filename="GaussSumTable.html"):
+def save_gauss_sum_table_as_html(table, filename="complex_gauss_sum_table.html"):
     """
-    Saves the Gauss sum table in an HTML file with MathJax LaTeX rendering and uniquely highlights groups of matching rows.
+    Saves the Complex Gauss sum table in an HTML file with MathJax LaTeX rendering.
+    Groups identical rows together and highlights them.
     """
-    # Generate a list of distinct colors for groups of matching rows
     colors = [
         "#d1ffd1", "#d1e7ff", "#ffd1d1", "#fff7d1", "#d1fff5", "#ffd1f9", "#e1d1ff", "#ffd9d1"
-    ]  # Extend this list if needed
+    ]
 
-    # Identify unique row groups and assign a color to each
-    unique_rows = list({tuple(row) for row in table})  # Get unique rows
-    color_map = {unique_row: colors[i % len(colors)] for i, unique_row in enumerate(unique_rows)}
+    # Find groups of identical rows and build a mapping for reordering
+    row_groups = {}
+    for i, row in enumerate(table):
+        row_tuple = tuple(row)
+        if row_tuple in row_groups:
+            row_groups[row_tuple]["indices"].append(i)
+        else:
+            row_groups[row_tuple] = {"indices": [i]}
+
+    # Sort groups by first occurrence and prepare color mapping
+    color_map = {}
+    ordered_indices = []
+    color_index = 0
+    
+    # First, add single rows (no matches)
+    for row_tuple, group in row_groups.items():
+        if len(group["indices"]) == 1:
+            ordered_indices.extend(group["indices"])
+    
+    # Then add groups of matching rows
+    for row_tuple, group in row_groups.items():
+        if len(group["indices"]) > 1:
+            for idx in group["indices"]:
+                color_map[idx] = colors[color_index % len(colors)]
+            ordered_indices.extend(group["indices"])
+            color_index += 1
 
     with open(filename, "w") as f:
-        f.write("<html><head><title>Gauss Sum Table</title>\n")
+        f.write("<html><head><title>Complex Gauss Sum Table</title>\n")
         f.write('<script type="text/javascript" async '
                 'src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?'
                 'config=TeX-AMS-MML_HTMLorMML"></script>\n')
         f.write('<style>table { border-collapse: collapse; width: 100%; }')
         f.write('th, td { border: 1px solid black; padding: 5px; text-align: center; font-size: 18px; }')
-        f.write('th { background-color: #f2f2f2; }')
-        # Generate CSS classes for each color
-        for unique_row, color in color_map.items():
-            f.write(f'.color-{color.replace("#", "")} {{ background-color: {color}; }}\n')
-        f.write("</style>\n</head><body>\n")
+        f.write('th { background-color: #f2f2f2; }</style>\n</head><body>\n')
 
-        f.write("<h2>Gauss Sum Table</h2>\n")
-        f.write('<div style="overflow-x:auto;">')  # Scrollable if needed
+        f.write("<h2>Complex Gauss Sum Table</h2>\n")
+        f.write('<div style="overflow-x:auto;">')
         f.write('<table>\n')
 
         # Header row
@@ -78,27 +97,24 @@ def save_gauss_sum_table_as_html(table, filename="GaussSumTable.html"):
             f.write(f"<th>\\( \\alpha = {alpha} \\)</th>")
         f.write("</tr>\n")
 
-        # Data rows with LaTeX rendering
-        for theta, row in enumerate(table):
-            # Get the color associated with the unique row
-            row_color = color_map[tuple(row)]
-            row_class = f"color-{row_color.replace('#', '')}"  # CSS class for the row
-
-            f.write(f"<tr class='{row_class}'><td>\\( {theta} \\)</td>")
-            for value in row:
+        # Data rows with LaTeX rendering, now in grouped order
+        for theta in ordered_indices:
+            style = f' style="background-color: {color_map[theta]}"' if theta in color_map else ""
+            f.write(f"<tr{style}><td>\\( {theta} \\)</td>")
+            for value in table[theta]:
                 f.write(f"<td>\\( {latex(value)} \\)</td>")
             f.write("</tr>\n")
 
         f.write("</table>\n</div>\n</body></html>\n")
 
-    print(f"Saved Gauss Sum Table as {filename}")
+    print(f"Saved Complex Gauss Sum Table as {filename}")
 
 def main():
     # Ask the user for a prime number
     while True:
         try:
             user_input = int(input("Enter a prime number (q >= 2): "))
-            if user_input < 2 or not is_prime(user_input):  # Check if the number is prime
+            if user_input < 2 or not is_prime(user_input):
                 raise ValueError("The number entered is not a prime number or is less than 2.")
             break
         except ValueError as e:
@@ -109,8 +125,8 @@ def main():
     gauss_sum_table_object = complex_gauss_sum_table(user_input)
     table_of_gauss_sum = gauss_sum_table_object.table
 
-    # Save as an HTML file
-    save_gauss_sum_table_as_html(table_of_gauss_sum)
+    # Save as an HTML file with the new filename
+    save_gauss_sum_table_as_html(table_of_gauss_sum, "complex_gauss_sum_table.html")
 
 # Run the program
 if __name__ == "__main__":
