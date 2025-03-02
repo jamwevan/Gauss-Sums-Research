@@ -3,12 +3,11 @@ class GaussSumTable:
         self.q = q
         self.additive_character_generator = additive_character_generator
         self.multiplicative_character_generator = multiplicative_character_generator
-        
+        # TODO: Does this stay the same?
         self.finite_field = GF(q^2)
         self.generator = self.finite_field.gen()
         self.finite_field_elements = list(self.finite_field)
         self.finite_field_multiplicative_group = [x for x in self.finite_field_elements if x != 0]
-        
         self.table = [[0 for _ in range(q - 1)] for _ in range(q^2 - 1)]
         self.compute_gauss_sum_table()
 
@@ -35,29 +34,34 @@ class GaussSumTable:
     def trace(self, x):
         return x.trace()  # Using the field trace function from GF(q^2) to GF(q)
 
-def complex_gauss_sum_table(q):
+# Change: Implementing helper function to calculate m
+    def max_power(N, l):
+        m = 0
+        while N % l == 0:
+            N //= l
+            m += 1
+        return m
+    
+# Change: Updated Function Arguments
+def complex_gauss_sum_table(q, l):
+    # Change: Checked if l is prime
+    if not isprime(l):
+        raise ValueError("l must be a prime number!")
+    # Check if q is a prime power
     prime_power_result = q.is_prime_power(get_data=True)
     if  prime_power_result[1] == 0:
         raise ValueError("Expected a prime power!")
     p = prime_power_result[0]
-    
-    # This is the start of my changes
-    m = 0
-    N = p * (q*q - 1)
-    
-    while (l^m < N):
-        if N/l^m = floor(N/l^m):
-            m = m
-            m = m + 1
-        else:
-            m = m + 1
-    
-    N_prime = N / l^m
-    
-    
-        
-    
-    return GaussSumTable(q, e^(2 * pi * I / p), e^(2 * pi * I / (q*q - 1)))
+    # Change: Implementing Extension Algo
+    N = p*(q*q-1)
+    m = max_power(n, l)
+    N_prime = n/(l**m)
+    c = carmichael_function(n_prime)
+    F = GF(l**c)
+    h = F.gen()
+    # Change: Updated arguments in function call
+    return GaussSumTable(q, h**((l**c-1)/p), h**((p*(l**c-1))/N_prime))
 
+# TODO: Update funciton call by adding an l value here William thinks is good
 gauss_sum_table_object = complex_gauss_sum_table(3)
 table_of_gauss_sum = gauss_sum_table_object.table
