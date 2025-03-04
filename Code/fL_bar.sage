@@ -89,7 +89,7 @@ def max_power(N, l):
 # Takes in q (a prime power) and l (a prime)
 # Computes necessary field parameters and constructs the table
 # -----------------------------------------------
-def complex_gauss_sum_table(q, l):
+def fL_bar_gauss_sum_table(q, l):
     # Ensure l is prime
     if not is_prime(l):
         raise ValueError("l must be a prime number!")
@@ -117,7 +117,7 @@ def complex_gauss_sum_table(q, l):
 # -----------------------------------------------
 # Example function call to construct a Gauss sum table for q=9 and l=5
 # -----------------------------------------------
-gauss_sum_table_object = complex_gauss_sum_table(9, 5)
+gauss_sum_table_object = fL_bar_gauss_sum_table(9, 5)
 
 # Store the computed table
 table_of_gauss_sum = gauss_sum_table_object.table
