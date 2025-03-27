@@ -5,7 +5,8 @@ from sage.all_cmdline import *   # import sage library
 _sage_const_2 = Integer(2); _sage_const_0 = Integer(0); _sage_const_1 = Integer(1)
 
 # Import necessary functions from Sage
-from sage.all import is_prime, carmichael_lambda, GF
+from sage.all import is_prime, carmichael_lambda, GF, expand
+
 
 # Class to compute the Gauss Sum Table over a finite field
 class GaussSumTable:
@@ -47,24 +48,38 @@ class GaussSumTable:
     # Compute the trace function from GF(q^2) to GF(q)
     def trace(self, x):
         return x.trace()
-    
-    # Find groups of identical rows in the Gauss sum table
-    def find_identical_rows(self):
-        row_patterns = {}
-        for theta, row in enumerate(self.table):
-            row_tuple = tuple(sorted(row))
-            row_counts = tuple(sorted([row.count(v) for v in set(row)]))
-            key = (row_tuple, row_counts)
-            
-            # Store theta values instead of just row indices
-            if key in row_patterns:
-                row_patterns[key].append(theta)
-            else:
-                row_patterns[key] = [theta]
 
-        # Extract only those groups that have more than one identical row
-        identical_groups = [theta_values for theta_values in row_patterns.values() if len(theta_values) > 1]
-        return identical_groups
+    # NEW: Find groups of rows where all entries are symbolically equal (after expansion)
+    def find_identical_rows(self):
+        n = len(self.table)
+        visited = set()
+        groups = []
+
+        for i in range(n):
+            if i in visited:
+                continue
+
+            group = [i]
+            visited.add(i)
+
+            for j in range(i + 1, n):
+                if j in visited:
+                    continue
+
+                match = True
+                for k in range(len(self.table[i])):
+                    if expand(self.table[i][k] - self.table[j][k]) != 0:
+                        match = False
+                        break
+
+                if match:
+                    group.append(j)
+                    visited.add(j)
+
+            if len(group) > 1:
+                groups.append(group)
+
+        return groups
 
     # Find counterexamples where the converse theorem fails
     def find_counterexamples(self, l, q):
@@ -72,10 +87,10 @@ class GaussSumTable:
         if (q - _sage_const_1) % l == _sage_const_0:
             identical_groups = self.find_identical_rows()
             if identical_groups:
-                # Sort the groups in descending order of size
                 identical_groups = sorted(identical_groups, key=len, reverse=True)
                 counterexamples.append((l, q, identical_groups))
         return counterexamples
+
 
 # Construct a Gauss sum table for given q and l
 def fL_bar_gauss_sum_table(q, l):
@@ -84,7 +99,7 @@ def fL_bar_gauss_sum_table(q, l):
     prime_power_result = q.is_prime_power(get_data=True)
     if prime_power_result[_sage_const_1] == _sage_const_0:
         raise ValueError("Expected a prime power!")
-    
+
     p = prime_power_result[_sage_const_0]
     N = p * (q*q - _sage_const_1)
     m = max_power(N, l)
@@ -94,6 +109,7 @@ def fL_bar_gauss_sum_table(q, l):
     h = F.gen()
     return GaussSumTable(q, h**((l**c - _sage_const_1) // p), h**((p * (l**c - _sage_const_1)) // N_prime))
 
+
 # Compute the highest power of l that divides N
 def max_power(N, l):
     m = _sage_const_0
@@ -102,17 +118,15 @@ def max_power(N, l):
         m += _sage_const_1
     return m
 
-# Main execution block
+
+# MAIN ENTRY POINT
 if __name__ == "__main__":
     l = Integer(input("Enter a prime l: "))
     q = Integer(input("Enter a prime power q: "))
 
-    
     gauss_sum_table_object = fL_bar_gauss_sum_table(q, l)
-    
     counterexamples = gauss_sum_table_object.find_counterexamples(l, q)
-    
-    # Print the results in table form
+
     print("\nCounterexamples where the converse theorem fails:")
     for l, q, identical_groups in counterexamples:
         print(f"l = {l}, q = {q}")

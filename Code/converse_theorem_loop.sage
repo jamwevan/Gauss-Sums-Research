@@ -55,13 +55,10 @@ class GaussSumTable:
             row_tuple = tuple(sorted(row))
             row_counts = tuple(sorted([row.count(v) for v in set(row)]))
             key = (row_tuple, row_counts)
-            
-            # Store theta values instead of just row indices
             if key in row_patterns:
                 row_patterns[key].append(theta)
             else:
                 row_patterns[key] = [theta]
-
         # Extract only those groups that have more than one identical row
         identical_groups = [theta_values for theta_values in row_patterns.values() if len(theta_values) > 1]
         return identical_groups
@@ -77,10 +74,20 @@ class GaussSumTable:
                 counterexamples.append((l, q, identical_groups))
         return counterexamples
 
+# Compute the highest power of l that divides N
+def max_power(N, l):
+    m = _sage_const_0
+    while N % l == _sage_const_0:
+        N //= l
+        m += _sage_const_1
+    return m
+
 # Construct a Gauss sum table for given q and l
 def fL_bar_gauss_sum_table(q, l):
     if not is_prime(l):
         raise ValueError("l must be a prime number!")
+    # Cast q to a Sage Integer to ensure it has is_prime_power method.
+    q = Integer(q)
     prime_power_result = q.is_prime_power(get_data=True)
     if prime_power_result[_sage_const_1] == _sage_const_0:
         raise ValueError("Expected a prime power!")
@@ -94,32 +101,33 @@ def fL_bar_gauss_sum_table(q, l):
     h = F.gen()
     return GaussSumTable(q, h**((l**c - _sage_const_1) // p), h**((p * (l**c - _sage_const_1)) // N_prime))
 
-# Compute the highest power of l that divides N
-def max_power(N, l):
-    m = _sage_const_0
-    while N % l == _sage_const_0:
-        N //= l
-        m += _sage_const_1
-    return m
-
-# Main execution block
+# Main execution block: ask the user for upper bounds and loop accordingly
 if __name__ == "__main__":
-    l = Integer(input("Enter a prime l: "))
-    q = Integer(input("Enter a prime power q: "))
-
+    # Ask the user for the upper bound for prime l and for q.
+    L_UPPER = Integer(input("Enter the upper bound for prime l: "))
+    Q_UPPER = Integer(input("Enter the upper bound for q (candidate prime powers): "))
     
-    gauss_sum_table_object = fL_bar_gauss_sum_table(q, l)
-    
-    counterexamples = gauss_sum_table_object.find_counterexamples(l, q)
-    
-    # Print the results in table form
-    print("\nCounterexamples where the converse theorem fails:")
-    for l, q, identical_groups in counterexamples:
-        print(f"l = {l}, q = {q}")
-        print("\nIdentical Theta Groups (Sorted by Size):")
-        print("-" * 100)
-        print(f"{'Size':<10}{'Identical Theta Group'}")
-        print("-" * 100)
-        for group in identical_groups:
-            print(f"{len(group):<10}{group}")
-        print("-" * 100)
+    # Loop over all primes l from 2 to the given upper bound.
+    for l in prime_range(2, L_UPPER + 1):
+        # Loop over q from 2 to the given upper bound.
+        for q in range(2, Q_UPPER + 1):
+            # Cast q to a Sage Integer before calling is_prime_power.
+            prime_power_result = Integer(q).is_prime_power(get_data=True)
+            if prime_power_result[_sage_const_1] != _sage_const_0:  # q is a prime power
+                try:
+                    gauss_sum_table_object = fL_bar_gauss_sum_table(q, l)
+                    counterexamples = gauss_sum_table_object.find_counterexamples(l, q)
+                    if counterexamples:
+                        print("\nCounterexamples for l =", l, "and q =", q)
+                        print("-" * 100)
+                        for l_val, q_val, identical_groups in counterexamples:
+                            print(f"l = {l_val}, q = {q_val}")
+                            print("Identical Theta Groups (Sorted by Size):")
+                            print(f"{'Size':<10}{'Identical Theta Group'}")
+                            print("-" * 100)
+                            for group in identical_groups:
+                                print(f"{len(group):<10}{group}")
+                            print("-" * 100)
+                except Exception as e:
+                    # Print the error and continue with the next iteration.
+                    print("Error for l =", l, "and q =", q, ":", e)
