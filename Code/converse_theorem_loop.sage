@@ -7,36 +7,50 @@ _sage_const_1 = Integer(1)
 _sage_const_3 = Integer(3)
 
 from sage.all import is_prime, carmichael_lambda, GF, expand
+from collections import defaultdict
 
 # -------------------------------------------------------------------------
-# GaussSumTable Class
+def max_power(N, l):
+    m = _sage_const_0
+    while N % l == _sage_const_0:
+        N //= l
+        m += _sage_const_1
+    return m
+
+# -------------------------------------------------------------------------
+def partition_by_mod_q_minus_l_power(group, q, l):
+    mod_dict = defaultdict(list)
+    m = max_power(q - 1, l)
+    mod_base = (q - 1) // (l**m)
+    for i in group:
+        mod_val = i % mod_base
+        mod_dict[mod_val].append(i)
+    subgroups = []
+    for mod_val in sorted(mod_dict.keys()):
+        subgroups.append(sorted(mod_dict[mod_val]))
+    return subgroups
+
 # -------------------------------------------------------------------------
 class GaussSumTable:
     def __init__(self, q, additive_character_generator, multiplicative_character_generator, l):
         self.q = q
-        self.l = l  # store prime l for range adjustments
+        self.l = l
         self.additive_character_generator = additive_character_generator
         self.multiplicative_character_generator = multiplicative_character_generator
         self.finite_field = GF(q**_sage_const_2)
         self.generator = self.finite_field.gen()
         self.finite_field_elements = list(self.finite_field)
-        self.finite_field_multiplicative_group = [
-            x for x in self.finite_field_elements if x != _sage_const_0
-        ]
-        # Compute new ranges for theta and alpha by removing the l-power factors.
-        N_theta = q**_sage_const_2 - _sage_const_1   # Order of F_{q^2}^*
+        self.finite_field_multiplicative_group = [x for x in self.finite_field_elements if x != _sage_const_0]
+
+        N_theta = q**_sage_const_2 - _sage_const_1
         m_theta = max_power(N_theta, l)
         self.theta_range = N_theta // (l**m_theta)
-        
-        N_alpha = q - _sage_const_1  # Order of F_q^*
+
+        N_alpha = q - _sage_const_1
         m_alpha = max_power(N_alpha, l)
         self.alpha_range = N_alpha // (l**m_alpha)
-        
-        # Create the table with adjusted dimensions.
-        self.table = [
-            [_sage_const_0 for _ in range(self.alpha_range)]
-            for _ in range(self.theta_range)
-        ]
+
+        self.table = [[_sage_const_0 for _ in range(self.alpha_range)] for _ in range(self.theta_range)]
         self.compute_gauss_sum_table()
 
     def compute_gauss_sum_table(self):
@@ -88,10 +102,6 @@ class GaussSumTable:
         return groups
 
     def find_counterexamples(self, l, q):
-        """
-        Return a list of (l, q, identical_groups) if (q-1) is divisible by l
-        and there are identical rows. identical_groups is sorted by descending size.
-        """
         counterexamples = []
         if (q - _sage_const_1) % l == _sage_const_0:
             identical_groups = self.find_identical_rows()
@@ -100,8 +110,6 @@ class GaussSumTable:
                 counterexamples.append((l, q, identical_groups))
         return counterexamples
 
-# -------------------------------------------------------------------------
-# Helper Functions
 # -------------------------------------------------------------------------
 def fL_bar_gauss_sum_table(q, l):
     if not is_prime(l):
@@ -123,18 +131,8 @@ def fL_bar_gauss_sum_table(q, l):
         l
     )
 
-def max_power(N, l):
-    m = _sage_const_0
-    while N % l == _sage_const_0:
-        N //= l
-        m += _sage_const_1
-    return m
-
+# -------------------------------------------------------------------------
 def is_q_of_the_form_1_plus_2_l_j(q, l):
-    """
-    Return True if q == 1 + 2*(l^j) for some j >= 1.
-    Otherwise, return False.
-    """
     if q <= 1:
         return False
     diff = q - _sage_const_1
@@ -148,37 +146,30 @@ def is_q_of_the_form_1_plus_2_l_j(q, l):
     return diff == _sage_const_1
 
 # -------------------------------------------------------------------------
-# Nicely aligned table printing
-# -------------------------------------------------------------------------
 def print_counterexample_table(rows):
-    """
-    Print a cleanly aligned ASCII table of counterexamples.
-    rows is a list of tuples (l_val, q_val, largest_size, form_check).
-    """
     if not rows:
-        print("No counterexamples with group size >= 3 found in the given ranges.")
+        print("No counterexamples with restricted group size >= 3 found in the given ranges.")
         return
 
-    # Sort by (l, q)
     rows.sort(key=lambda row: (row[0], row[1]))
 
-    print("\nCounterexamples (where largest identical group has size >= 3)\n")
-    line = "-" * 66
+    print("\nCounterexamples (where largest restricted subgroup has size >= 3):\n")
+    line = "-" * 64
     print(line)
-    # Header
-    print("| {0:<10} | {1:<18} | {2:<17} |".format("(l, q)", "Largest Group Size", "q = 1 + 2 l^j ?"))
+    print("| {:^9} | {:^21} | {:^23} |".format(
+        "(ℓ, q)",
+        "θ₁|𝔽*_q = θ₂|𝔽*_q",
+        "q = 1 + 2 ℓ^j"
+    ))
     print(line)
-    # Rows
-    for (l_val, q_val, size_val, bool_val) in rows:
-        # Convert to strings
-        lq_str = f"({l_val}, {q_val})"
-        size_str = str(size_val)
-        bool_str = str(bool_val)
-        print("| {0:<10} | {1:<18} | {2:<17} |".format(lq_str, size_str, bool_str))
+    for (l_val, q_val, subgroup_size, bool_val) in rows:
+        print("| {:^9} | {:^21} | {:^23} |".format(
+            f"({l_val}, {q_val})",
+            str(subgroup_size),
+            "True" if bool_val else "False"
+        ))
     print(line)
 
-# -------------------------------------------------------------------------
-# MAIN ENTRY POINT
 # -------------------------------------------------------------------------
 if __name__ == "__main__":
     l_upper = Integer(input("Enter the upper bound for prime l: "))
@@ -186,24 +177,24 @@ if __name__ == "__main__":
 
     table_rows = []
 
-    # Loop over all primes l in [2, l_upper]
     for l_candidate in range(2, l_upper + 1):
         l_val = Integer(l_candidate)
         if is_prime(l_val):
-            # Loop over all integers q_candidate in [2, q_upper]
             for q_candidate in range(2, q_upper + 1):
                 q_candidate_sage = Integer(q_candidate)
                 prime_power_data = q_candidate_sage.is_prime_power(get_data=True)
-                if prime_power_data[1] != _sage_const_0:  # it's a prime power
+                if prime_power_data[1] != _sage_const_0:
                     q_val = q_candidate_sage
-                    # Build the GaussSumTable and look for identical groups
                     gauss_sum_table_object = fL_bar_gauss_sum_table(q_val, l_val)
                     counterexamples = gauss_sum_table_object.find_counterexamples(l_val, q_val)
                     for (_, _, identical_groups) in counterexamples:
-                        largest_size = len(identical_groups[0])
-                        if largest_size >= _sage_const_3:
+                        largest_subgroup_size = 0
+                        for group in identical_groups:
+                            mod_subgroups = partition_by_mod_q_minus_l_power(group, q_val, l_val)
+                            group_max = max(len(s) for s in mod_subgroups)
+                            largest_subgroup_size = max(largest_subgroup_size, group_max)
+                        if largest_subgroup_size >= 3:
                             form_check = is_q_of_the_form_1_plus_2_l_j(q_val, l_val)
-                            table_rows.append((l_val, q_val, largest_size, form_check))
+                            table_rows.append((l_val, q_val, largest_subgroup_size, form_check))
 
-    # Print the final table
     print_counterexample_table(table_rows)
