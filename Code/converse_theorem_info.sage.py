@@ -186,7 +186,7 @@ def fL_bar_gauss_sum_table(q, l):
 # -------------------------------------------------------------------------
 if __name__ == "__main__":
     # Read user input for prime l and prime power q
-    l = Integer(input("Enter a prime l: "))
+    l = Integer(input("Enter a prime ℓ: "))
     q = Integer(input("Enter a prime power q: "))
 
     # Generate Gauss sum table for the given l and q
