@@ -152,8 +152,6 @@ def print_counterexample_table(rows):
         return
 
     rows.sort(key=lambda row: (row[0], row[1]))
-
-    print("\nCounterexamples (where largest restricted subgroup has size >= 3):\n")
     line = "-" * 64
     print(line)
     print("| {:^9} | {:^21} | {:^23} |".format(
@@ -171,6 +169,7 @@ def print_counterexample_table(rows):
     print(line)
 
 # -------------------------------------------------------------------------
+# Modified main execution block based on user request
 if __name__ == "__main__":
     l_upper = Integer(input("Enter the upper bound for prime l: "))
     q_upper = Integer(input("Enter the upper bound for prime-power q: "))
@@ -185,6 +184,11 @@ if __name__ == "__main__":
                 prime_power_data = q_candidate_sage.is_prime_power(get_data=True)
                 if prime_power_data[1] != _sage_const_0:
                     q_val = q_candidate_sage
+
+                    # ONLY continue if q is of the form 1 + 2 * l^j
+                    if not is_q_of_the_form_1_plus_2_l_j(q_val, l_val):
+                        continue
+
                     gauss_sum_table_object = fL_bar_gauss_sum_table(q_val, l_val)
                     counterexamples = gauss_sum_table_object.find_counterexamples(l_val, q_val)
                     for (_, _, identical_groups) in counterexamples:
@@ -193,8 +197,11 @@ if __name__ == "__main__":
                             mod_subgroups = partition_by_mod_q_minus_l_power(group, q_val, l_val)
                             group_max = max(len(s) for s in mod_subgroups)
                             largest_subgroup_size = max(largest_subgroup_size, group_max)
-                        if largest_subgroup_size >= 3:
-                            form_check = is_q_of_the_form_1_plus_2_l_j(q_val, l_val)
-                            table_rows.append((l_val, q_val, largest_subgroup_size, form_check))
+
+                        
+                        counterexample_flag = largest_subgroup_size >= 3
+
+                        table_rows.append((l_val, q_val, largest_subgroup_size, counterexample_flag))
 
     print_counterexample_table(table_rows)
+
