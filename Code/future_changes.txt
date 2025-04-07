@@ -1,3 +1,1 @@
-Extend code to work with other fields.
-When q=5, 1 and 5 and 2 and 10 should have same gauss sum.
-Check equalities using expand (reference photo). 
+Great, thanks! Can you find an example of the form q=1+2l^j that does not have counterexamples?
