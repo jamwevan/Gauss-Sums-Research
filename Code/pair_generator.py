@@ -15,13 +15,14 @@ def is_prime_power(n):
     return False
 
 # Read existing (ℓ, q) pairs from a CSV file into a set
+# Now supports files with more than 2 columns by only reading the first two
 def read_existing_pairs(file_path):
     existing = set()
     if os.path.exists(file_path):
         with open(file_path, newline='') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                if len(row) == 2:
+                if len(row) >= 2:  # Accept rows with 2+ columns
                     try:
                         l, q = int(row[0]), int(row[1])
                         existing.add((l, q))
@@ -29,7 +30,7 @@ def read_existing_pairs(file_path):
                         continue
     return existing
 
-# Write new (ℓ, q) pairs to the CSV file
+# Write new (ℓ, q) pairs to the CSV file (still writes only 2 columns)
 def append_pairs_to_file(file_path, pairs):
     with open(file_path, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
@@ -61,7 +62,7 @@ def generate_lq_pairs(count, existing_pairs):
 
 # Main program
 if __name__ == "__main__":
-    file_path = "conjecture_pairs.csv"
+    file_path = "pairs.csv"
     x = int(input("How many (ℓ, q) pairs do you want? "))
 
     existing = read_existing_pairs(file_path)
