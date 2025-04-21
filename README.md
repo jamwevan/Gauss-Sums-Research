@@ -7,20 +7,13 @@ q = 2ℓ^i + 1 (for some integer i > 0)
 ## Tools
 
 - **pair_generator.py**  
-  Identifies candidate (ℓ, q) pairs that follow the conjectured form.
+When the script is executed, it first prompts the user to specify how many new \((\ell, q)\) pairs to generate. It then reads in any previously recorded pairs from the file \texttt{pairs.csv} to ensure no duplicates are produced. Using this existing data, the script generates the requested number of new pairs of the form \(q = 1 + 2\ell^j\), where \(\ell\) is a prime and \(q\) is a prime power. Once generated, the new pairs are appended to the CSV file. Finally, the script prints a message indicating how many new \((\ell, q)\) pairs were successfully added to the file.
 
-- **conjecture.sage**  
-  Constructs Gauss sum tables over Fℓ̄ using candidate pairs from `pair_generator.py` and checks if they produce a theta group of size greater than 2 (indicating a counter example).
+- **anti_pair_generator.py** 
+This script generates \((\ell, q)\) pairs that intentionally fall \textit{outside} the form \(q = 1 + 2\ell^j\), with the goal of identifying structured counterexamples to the conjecture. After prompting the user for the number of pairs to generate, it reads in any existing data from \texttt{anti\_pairs.csv} to avoid duplication. It then loops over prime values of \(\ell\) and checks integers \(q < 100\), filtering for those that are prime powers, not powers of 2, and do not satisfy the conjectural form. Any such \((\ell, q)\) pair not already in the file is added to the output list. Once the desired number of new pairs is found, the script appends them to the CSV file and prints a message indicating how many were added.
 
 - **converse_theorem_info.sage**  
   Investigates specific (ℓ, q) pairs by computing Gauss sums modulo ℓ to verify whether they serve as counter examples, regardless of their form.
-
-## Table of Contents
-- [Tools](#tools)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [Contact](#contact)
 
 ## Getting Started
 
@@ -33,28 +26,20 @@ q = 2ℓ^i + 1 (for some integer i > 0)
 ### Installation
 
 1. **Clone the repository**:
-`git clone https://github.com/jamwevan/MATH-440.git`  
-`cd MATH-440/Code`
-
-2. **Set up your environment**:  
-Ensure SageMath is installed and accessible via the command line. Optionally, create a Python virtual environment:
-`python3 -m venv venv`  
-`source venv/bin/activate`  
-`pip install -r requirements.txt`
+`git clone https://github.com/jamwevan/Gauss-Sums-Research.git`  
+`cd Gauss-Sums-Research/Code`
 
 ## Usage
 
 1. **Run the Pair Generator**:  
 `python pair_generator.py`  
-This script scans for candidate (ℓ, q) pairs that follow the conjectured form and outputs the maximum candidate values (l_max and q_max). Note these values.
 
-2. **Test Candidate Pairs with conjecture.sage**:  
-`sage conjecture.sage`  
-When prompted, enter the l_max and q_max values from the pair generator. The script builds Gauss sum tables over Fℓ̄ and checks if the candidate pairs yield a counter example (e.g., a theta group larger than 2).
+2. **Run the Anti-Pair Generator**:  
+`python anti_pair_generator.py`
 
-3. **Test Specific (ℓ, q) Pairs with converse_theorem_info.sage**:  
+3. **Test Specific (ℓ, q) Pairs with converse_theorem.sage**:  
 `sage converse_theorem_info.sage`  
-Follow the prompts to enter any (ℓ, q) values. This script computes Gauss sums modulo ℓ and verifies if the pair is a counter example.
+Follow the prompts to enter any (ℓ, q) pair. This script computes Gauss sums modulo ℓ and verifies if the pair is a counter example.
 
 ## Contributors
 
